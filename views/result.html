@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<style>
+    table,tr,td{
+        border: 1px solid black;
+    }
+</style>
+<body>
+    <center>
+        <h1 class=" mt-5">Show Result</h1>
+
+        <table id="tbl">
+            <tr id="tr_n">
+                <td class="p-2 text-center" style="font-weight: bold;">Student Name</td>
+            </tr>
+            <tr id="tr_t">
+                <td class="p-2 text-center">Total Marks</td>
+            </tr>
+            <tr id="tr_a">
+                <td class="p-2 text-center">Archived Marks</td>
+            </tr>
+            <tr id="tr_p">
+                <td class="p-2 text-center">Percentage</td>
+            </tr>
+            <tr id="tr_s">
+                <td class="p-2 text-center" style="font-weight: bold;">Subject Name</td>
+                <td class="p-2 text-center" style="font-weight: bold;">Marks</td>
+            </tr>
+        </table>
+
+    </center>
+
+    <script>
+            const showResult = async () => {
+                try {
+                   let id = window.location.search.split("?id=")[1]
+                   console.log(id);
+
+                   const result =await fetch(`http://localhost:3800/marks/${id}`)
+                   
+                   if(result.status === 200){
+                       res = await result.json()
+                    }
+                    console.log(res);
+
+                    const data = res.result
+
+                    console.log(data);
+
+
+                    const tbl = document.getElementById("tbl")
+                    const tr_n = document.getElementById("tr_n")
+                    const tr_t = document.getElementById("tr_t")
+                    const tr_a = document.getElementById("tr_a")
+                    const tr_p = document.getElementById("tr_p")
+                   
+                   
+
+                    let i = 0;
+
+                    while(i<data.length){
+                        
+                        
+                        var td1 = document.createElement("td");
+                        td1.style.textAlign="center"
+                        td1.style.padding="0.6rem"
+                        td1.style.fontWeight="bold"
+                        td1.innerText = data[i].student.name;
+
+                        var td2 = document.createElement("td");
+                        td2.style.textAlign="center"
+                        td2.innerText = data[i].totalMarks
+
+                        var td3 = document.createElement("td")
+                        td3.style.textAlign="center"
+                        td3.innerText = data[i].archivedMarks
+
+                        var td4 = document.createElement("td")
+                        td4.style.textAlign="center"
+                        td4.innerText = data[i].percentage
+
+
+                        data[i].subject.map((e) => {
+                            
+                            let tr_s = document.createElement("tr")
+                            let td_s1 = document.createElement("td")
+                            td_s1.style.textAlign="center"
+                            let td_s2 = document.createElement("td")
+                            td_s2.style.textAlign="center"
+
+                            td_s1.innerText = e.name
+                            td_s2.innerText = e.marks
+
+                            tr_s.appendChild(td_s1)
+                            tr_s.appendChild(td_s2)
+                            tbl.appendChild(tr_s)
+                        })
+
+
+                        tr_p.appendChild(td4)
+                        tr_a.appendChild(td3)
+                        tr_t.appendChild(td2)
+                        tr_n.appendChild(td1);
+                        i++
+                    }
+
+                } catch (error) {
+                    console.log(error);
+                }
+
+            }
+            showResult()
+    </script>
+</body>
+</html>

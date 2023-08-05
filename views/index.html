@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <style>
+        input{
+            border: none;
+            border-bottom: 2px solid gray;
+        }
+        table{
+            border: 2px solid black;
+        }
+        tr,td{
+            border: 2px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-around align-items-center bg-danger">
+            <center>
+                <h1>Add Student</h1>
+                <div class="d-block">
+                    <div class="py-2">
+                        <input type="text" placeholder="Student Name" id="studentName">
+                    </div>
+                    <div class="py-2">
+                        <input type="text" placeholder="Standard" id="standard">
+                    </div>
+                    <button class="btn btn-primary mt-2" id="btn">Add Student</button>
+                </div>
+            </center>
+            
+            <center class="py-5">
+                <h1>Add Subject</h1>
+                <div class="d-block">
+                    <div class="py-2">
+                        <input type="text" placeholder="Subject Name" id="subName">
+                    </div>
+                    <button class="btn btn-primary mt-2" id="btn2">Add Subject</button>
+                </div>
+            </center>
+        </div>
+    </div>
+
+    <div class="mark bg-danger m-5">
+        <h1 class="text-center">Add Marks</h1>
+
+<div class="mark d-flex justify-content-center gap-5 align-items-center bg-danger p-3">
+    <select id="select_student" onchange="selectHandleChange(this,'student')">
+        <option value="0" >---Select Student---</option>
+    </select>
+
+    <select id="select_subject" onchange="selectHandleChange(this,'subject')">
+        <option value="0" >---Select Subject---</option>
+    </select>
+
+    <input type="number" id="marks" placeholder="Enter Marks" class="p-2"/>
+
+    <button id="markbtn">Add Marks</button>
+</div>
+</div>
+
+
+<div class="result pt-5">
+    <h1 class="text-center">Show Result</h1>
+    <center>
+        <div class="pt-2">
+            <table class="tbl" id="tbl">
+                <tr>
+                    <td>Studentname</td>
+                    <td>Actions</td>
+                </tr>
+            </table>
+        </div>
+    </center>
+
+</div>
+
+</body>
+</html>
+
+        <script>
+            const marksDetails = {
+                student:"",
+                subject:"",
+                marks:0
+            }
+            
+            const btn = document.getElementById("btn")
+            const AddStudent = async () => {
+                try {
+
+                    const data = {
+                        name:document.getElementById("studentName").value,
+                        std:document.getElementById("standard").value
+                    }
+                    console.log(data);
+                    if(!data.name) return alert("Please enter yosur Studentname")
+                    if(!data.std) return alert("Please enter your Standard")
+
+                    let options = {
+                        method:"POST",
+                        headers:{
+                            "Content-Type" : "application/json"
+                        },
+                        body:JSON.stringify(data)
+                    }
+
+                    let res = await fetch("http://localhost:3800/student/insert",options)
+                    // console.log(res);
+                    if(res.status === 200){
+                        res = await res.json()
+                        // getData()
+                    }else{
+                        res = await res.json()
+                        return alert(res.message)
+                    }
+
+                    const urlToOpen = 'http://localhost:3800/view/index.html';
+
+                    window.open(urlToOpen, '_self');  
+                } 
+                 
+                catch (error) {
+                    return alert(error.message)
+                }
+
+            }
+            btn.addEventListener("click",AddStudent)
+           
+          
+            const btn2 = document.getElementById("btn2")
+            const AddSubject = async () => {
+                try {
+
+                    const data = {
+                        name:document.getElementById("subName").value
+                    }
+                    console.log(data);
+                    if(!data.name) return alert("Please enter yosur Subjectname")
+                    
+
+                    let options = {
+                        method:"POST",
+                        headers:{
+                            "Content-Type" : "application/json"
+                        },
+                        body:JSON.stringify(data)
+                    }
+
+                    let res = await fetch("http://localhost:3800/subject/insert",options)
+                    console.log(res);
+                    if(res.status === 200){
+                        res = await res.json()
+                        // getData()
+                    }else{
+                        res = await res.json()
+                        return alert(res.message)
+                    }
+
+                    const urlToOpen = 'http://localhost:3800/view/index.html';
+
+                    window.open(urlToOpen, '_self');  
+                    
+                } catch (error) {
+                    return alert(error.message)
+                }
+
+            }
+            btn2.addEventListener("click",AddSubject)
+
+
+          const showStudent = async() => {
+
+            try {
+                const result = await fetch("http://localhost:3800/student/getstudent")
+                if(result.status === 200){
+                    data = await result.json()
+                }else{
+                    data = await result.json()
+                    return alert(result.message)
+                }
+                console.log(result);
+                Student = data.student
+
+                console.log(Student);
+
+                const select = document.getElementById("select_student")
+                let i = 0
+                while( i < Student.length){
+                    let option = document.createElement("option")
+                    option.value = Student[i]._id
+                    option.innerText = Student[i].name
+                    select.appendChild(option)
+                    i++
+                }
+                StudentName()
+                return
+            } catch (error) {
+                console.log(error);
+                return alert(error.message)
+            }
+          }
+          showStudent()
+
+
+          const showSubject = async() => {
+                try {
+                    const result = await fetch("http://localhost:3800/subject/getsubject")
+                    if(result.status === 200){
+                        data = await result.json()
+                    }else{
+                        data = await result.json()
+                        return alert(result.message)
+                    }
+                    console.log(result);
+
+                    Subject = data.subject
+                    // console.log(Subject);
+
+                    const select = document.getElementById("select_subject")
+
+                    let i = 0;
+                    while(i < Subject.length){
+                        let option = document.createElement("option")
+                        option.value = Subject[i]._id
+                        option.innerText = Subject[i].name
+                        select.appendChild(option)
+                        i++
+                    }
+                    return
+                } catch (error) {
+                    console.log(error);
+                    return alert(error.message)
+                }
+          }
+          showSubject()
+
+          
+          const markbtn = document.getElementById("markbtn")
+          const AddMarks = async() => {
+            try {
+                const data = {
+                    marks:document.getElementById("marks").value,
+                    student:marksDetails.student,
+                    subject:marksDetails.subject,
+                    totalMarks:100
+                }
+                console.log(data);
+                if(!data.marks){ return alert("Please Enter Your Marks")}
+
+                let options = {
+                        method:"POST",
+                        headers:{
+                            "Content-Type" : "application/json"
+                        },
+                        body:JSON.stringify(data)
+                    }
+
+                    let res = await fetch("http://localhost:3800/marks/",options)
+                    // console.log(res);
+                    if(res.status === 200){
+                        res = await res.json()
+                    }else{
+                        res = await res.json()
+                        return alert(res.message)
+                    }
+
+                    const urlToOpen = 'http://localhost:3800/view/index.html';
+
+                    window.open(urlToOpen, '_self');  
+
+            } catch (error) {
+                console.log(error);
+                return alert(error.message)
+            }
+          }
+          markbtn.addEventListener("click",AddMarks)
+          
+          const selectHandleChange = (target , key) => {
+            marksDetails[key] = target.value
+            console.log(marksDetails);
+          }
+
+          const StudentName = async() => {
+
+            console.log(Student);
+           let tbl = document.getElementById("tbl")
+            
+           Student.forEach((x) => {
+            let tr = document.createElement("tr")
+            let td = document.createElement("td")
+            
+            td.innerText = x.name
+            
+            let trd = document.createElement("td")
+            let show = document.createElement("button")
+            
+            show.innerText = "show"
+            show.style.backgroundColor="green"
+            show.style.padding="0.5rem"
+            show.style.color="white"
+            show.id = `sh_${x._id}`
+            // console.log(id);
+            
+            show.addEventListener("click", (e) => {
+                let id = e.target.id.split("_")[1]
+                window.location.href = `http://localhost:3800/view/result.html?id=${id}`
+            })
+            
+            trd.appendChild(show)
+            tr.appendChild(td)
+            tr.appendChild(trd)
+            tbl.appendChild(tr)
+
+
+            
+
+
+           });
+          }
+          StudentName()
+        </script>
